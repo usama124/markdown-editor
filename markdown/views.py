@@ -1,3 +1,5 @@
+import json
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from markdown.models import Document, Tags
@@ -46,8 +48,6 @@ class DocumentAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         serializer = DocumentSerializer(request.data)
-        if not serializer.is_valid():
-            return Response(data={"details": "Invalid data"}, status=400)
 
         tags = serializer.validated_data.get("tags")
         serializer.save()
@@ -68,9 +68,7 @@ class DocumentAPIView(APIView):
         if doc is None:
             return Response(data={"details": "Document not found against id"}, status=404)
 
-        serializer = DocumentSerializer(request.data, instance=doc)
-        if not serializer.is_valid():
-            return Response(data={"details": "Invalid data"}, status=400)
+        serializer = DocumentSerializer(request.POST, instance=doc)
 
         tags = serializer.validated_data.get("tags")
         serializer.save()
